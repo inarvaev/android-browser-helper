@@ -43,13 +43,13 @@ import com.google.androidbrowserhelper.trusted.splashscreens.SplashScreenStrateg
  * Encapsulates the steps necessary to launch a Trusted Web Activity, such as establishing a
  * connection with {@link CustomTabsService}.
  */
-public class TwaLauncher {
+public class TwaLauncher implements FallbackStrategyResult {
     private static final String TAG = "TwaLauncher";
 
     private static final int DEFAULT_SESSION_ID = 96375;
 
     public static final FallbackStrategy CCT_FALLBACK_STRATEGY =
-            (context, twaBuilder, providerPackage, completionCallback) -> {
+            (context, twaBuilder, providerPackage, completionCallback, fallbackStrategyResult) -> {
         // CustomTabsIntent will fall back to launching the Browser if there are no Custom Tabs
         // providers installed.
         CustomTabsIntent intent = twaBuilder.buildCustomTabsIntent();
@@ -67,16 +67,20 @@ public class TwaLauncher {
     };
 
     public static final FallbackStrategy WEBVIEW_FALLBACK_STRATEGY =
-            (context, twaBuilder, providerPackage, completionCallback) -> {
+            (context, twaBuilder, providerPackage, completionCallback, fallbackStrategyResult) -> {
         Intent intent = WebViewFallbackActivity.createLaunchIntent(context,
                 twaBuilder.getUri(), LauncherActivityMetadata.parse(context));
         context.startActivity(intent);
         if (completionCallback != null) {
             completionCallback.run();
         }
+        if (fallbackStrategyResult != null) {
+            fallbackStrategyResult.setResultIntent(intent);
+        }
     };
 
     private Context mContext;
+    private Intent mWebviewIntent;
 
     @Nullable
     private final String mProviderPackage;
@@ -96,11 +100,18 @@ public class TwaLauncher {
 
     private boolean mDestroyed;
 
+    @Override
+    public void setResultIntent(Intent intent) {
+        //
+    }
+
+
     public interface FallbackStrategy {
         void launch(Context context,
                     TrustedWebActivityIntentBuilder twaBuilder,
                     @Nullable String providerPackage,
-                    @Nullable Runnable completionCallback);
+                    @Nullable Runnable completionCallback,
+                    FallbackStrategyResult fallbackStrategyResult);
     }
 
     /**
@@ -179,7 +190,8 @@ public class TwaLauncher {
             launchTwa(twaBuilder, customTabsCallback, splashScreenStrategy, completionCallback,
                     fallbackStrategy);
         } else {
-            fallbackStrategy.launch(mContext, twaBuilder, mProviderPackage, completionCallback);
+            fallbackStrategy.launch(mContext, twaBuilder, mProviderPackage, completionCallback, this);
+            // Здесь создаётся вебвью (как я понял, основной), и похоже что кроме как из mContext его выдрать больше неоткуда
         }
 
         // Remember who we connect to as the package that is allowed to delegate notifications
@@ -189,6 +201,20 @@ public class TwaLauncher {
             // provider in DelegationService instead.
             mTokenStore.store(Token.create(mProviderPackage, mContext.getPackageManager()));
         }
+    }
+
+    public void launch(TrustedWebActivityIntentBuilder twaBuilder,
+                       CustomTabsCallback customTabsCallback,
+                       @Nullable SplashScreenStrategy splashScreenStrategy,
+                       @Nullable Runnable completionCallback,
+                       FallbackStrategy fallbackStrategy,
+                       FallbackStrategyResult fallbackStrategyResult) {
+        this.launch(twaBuilder,
+                customTabsCallback,
+                splashScreenStrategy,
+                completionCallback,
+                fallbackStrategy);
+        // TODO: implement fallbackStrategyResult
     }
 
     /**
@@ -232,7 +258,8 @@ public class TwaLauncher {
             // The provider has been unable to create a session for us, we can't launch a
             // Trusted Web Activity. We launch a fallback specially designed to provide the
             // best user experience.
-            fallbackStrategy.launch(mContext, twaBuilder, mProviderPackage, completionCallback);
+            fallbackStrategy.launch(mContext, twaBuilder, mProviderPackage, completionCallback, null);
+            // Здесь создаётся вебвью (почему-то failed runnable), и похоже что кроме как из mContext его выдрать больше неоткуда
         };
 
         if (mServiceConnection == null) {
