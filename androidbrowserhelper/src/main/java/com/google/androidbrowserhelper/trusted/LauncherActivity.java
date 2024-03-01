@@ -118,6 +118,13 @@ public class LauncherActivity extends Activity {
     @Nullable
     private TwaLauncher mTwaLauncher;
 
+    public Intent webviewIntent() {
+        if (mTwaLauncher == null) {
+            return null;
+        }
+        return mTwaLauncher.webviewIntent();
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

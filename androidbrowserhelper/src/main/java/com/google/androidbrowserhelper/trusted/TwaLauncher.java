@@ -82,6 +82,10 @@ public class TwaLauncher implements FallbackStrategyResult {
     private Context mContext;
     private Intent mWebviewIntent;
 
+    public Intent webviewIntent() {
+        return mWebviewIntent;
+    }
+
     @Nullable
     private final String mProviderPackage;
 
@@ -102,7 +106,7 @@ public class TwaLauncher implements FallbackStrategyResult {
 
     @Override
     public void setResultIntent(Intent intent) {
-        //
+        mWebviewIntent = intent;
     }
 
 
@@ -191,7 +195,6 @@ public class TwaLauncher implements FallbackStrategyResult {
                     fallbackStrategy);
         } else {
             fallbackStrategy.launch(mContext, twaBuilder, mProviderPackage, completionCallback, this);
-            // Здесь создаётся вебвью (как я понял, основной), и похоже что кроме как из mContext его выдрать больше неоткуда
         }
 
         // Remember who we connect to as the package that is allowed to delegate notifications
@@ -214,7 +217,9 @@ public class TwaLauncher implements FallbackStrategyResult {
                 splashScreenStrategy,
                 completionCallback,
                 fallbackStrategy);
-        // TODO: implement fallbackStrategyResult
+//        if (fallbackStrategyResult != null) {
+//            fallbackStrategyResult.setResultIntent(mWebviewIntent);
+//        }
     }
 
     /**
@@ -259,7 +264,6 @@ public class TwaLauncher implements FallbackStrategyResult {
             // Trusted Web Activity. We launch a fallback specially designed to provide the
             // best user experience.
             fallbackStrategy.launch(mContext, twaBuilder, mProviderPackage, completionCallback, null);
-            // Здесь создаётся вебвью (почему-то failed runnable), и похоже что кроме как из mContext его выдрать больше неоткуда
         };
 
         if (mServiceConnection == null) {
