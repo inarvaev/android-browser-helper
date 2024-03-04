@@ -227,7 +227,7 @@ public class WebViewFallbackActivity extends Activity {
             }
 
             private boolean shouldOverrideUrlLoading(Uri navigationUrl) {
-                Uri launchUrl = WebViewFallbackActivity.this.mLaunchUrl;
+                /*Uri launchUrl = WebViewFallbackActivity.this.mLaunchUrl;
                 // If the user is navigation to a different origin, use CCT to handle the navigation
                 //
                 // URIs with the `data` scheme are handled in the WebView.
@@ -254,7 +254,7 @@ public class WebViewFallbackActivity extends Activity {
                                 "ActivityNotFoundException while launching '%s'", navigationUrl));
                         return false;
                     }
-                }
+                }*/
 
                 return false;
             }
@@ -334,5 +334,6 @@ public class WebViewFallbackActivity extends Activity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             webSettings.setMediaPlaybackRequiresUserGesture(false);
         }
+        webSettings.setUserAgentString("Mozilla/5.0 (iPhone; CPU iPhone OS 17_0_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1");
     }
 }
