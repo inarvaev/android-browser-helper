@@ -19,6 +19,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
+import android.webkit.WebView;
 
 import com.google.androidbrowserhelper.trusted.splashscreens.SplashScreenStrategy;
 
@@ -263,7 +264,7 @@ public class TwaLauncher implements FallbackStrategyResult {
             // The provider has been unable to create a session for us, we can't launch a
             // Trusted Web Activity. We launch a fallback specially designed to provide the
             // best user experience.
-            fallbackStrategy.launch(mContext, twaBuilder, mProviderPackage, completionCallback, null);
+            fallbackStrategy.launch(mContext, twaBuilder, mProviderPackage, completionCallback, this);
         };
 
         if (mServiceConnection == null) {
@@ -277,8 +278,8 @@ public class TwaLauncher implements FallbackStrategyResult {
     }
 
     private void launchWhenSessionEstablished(TrustedWebActivityIntentBuilder twaBuilder,
-            @Nullable SplashScreenStrategy splashScreenStrategy,
-            @Nullable Runnable completionCallback) {
+                                              @Nullable SplashScreenStrategy splashScreenStrategy,
+                                              @Nullable Runnable completionCallback) {
         if (mSession == null) {
             throw new IllegalStateException("mSession is null in launchWhenSessionEstablished");
         }
@@ -292,11 +293,11 @@ public class TwaLauncher implements FallbackStrategyResult {
     }
 
     private void launchWhenSplashScreenReady(TrustedWebActivityIntentBuilder builder,
-            @Nullable Runnable completionCallback) {
+                                             @Nullable Runnable completionCallback) {
         if (mDestroyed || mSession == null) {
             return;  // Service was disconnected and / or TwaLauncher was destroyed while preparing
-                     // the splash screen (e.g. user closed the app). See https://crbug.com/1052367
-                     // for further details.
+            // the splash screen (e.g. user closed the app). See https://crbug.com/1052367
+            // for further details.
         }
         Log.d(TAG, "Launching Trusted Web Activity.");
         TrustedWebActivityIntent intent = builder.build(mSession);
@@ -353,18 +354,18 @@ public class TwaLauncher implements FallbackStrategyResult {
                 client.warmup(0);
             }
 
-            try {
+          /*  try {
                 mSession = client.newSession(mCustomTabsCallback, mSessionId);
 
                 if (mSession != null && mOnSessionCreatedRunnable != null) {
                     mOnSessionCreatedRunnable.run();
                 } else if (mSession == null && mOnSessionCreationFailedRunnable != null) {
                     mOnSessionCreationFailedRunnable.run();
-                }
-            } catch (RuntimeException e) {
-                Log.w(TAG, e);
+                }*/
+           /* } catch (RuntimeException e) {
+                Log.w(TAG, e); */
                 mOnSessionCreationFailedRunnable.run();
-            }
+           /* }*/
 
             mOnSessionCreatedRunnable = null;
             mOnSessionCreationFailedRunnable = null;

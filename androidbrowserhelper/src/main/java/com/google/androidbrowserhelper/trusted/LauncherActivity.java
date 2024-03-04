@@ -378,10 +378,10 @@ public class LauncherActivity extends Activity {
      * fallback implementation ot starting a native Activity.
      */
     protected TwaLauncher.FallbackStrategy getFallbackStrategy() {
-        if (FALLBACK_TYPE_WEBVIEW.equalsIgnoreCase(mMetadata.fallbackStrategyType)) {
+       /*if (FALLBACK_TYPE_WEBVIEW.equalsIgnoreCase(mMetadata.fallbackStrategyType)) {
             return TwaLauncher.WEBVIEW_FALLBACK_STRATEGY;
-        }
-        return TwaLauncher.CCT_FALLBACK_STRATEGY;
+        }*/
+        return TwaLauncher.WEBVIEW_FALLBACK_STRATEGY;
     }
 
     /**

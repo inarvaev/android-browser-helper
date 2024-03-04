@@ -49,7 +49,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+class WebViewHolder {
+    public WebView webView;
+}
+
 public class WebViewFallbackActivity extends Activity {
+    protected static WebViewHolder webViewHolder = new WebViewHolder();
     private static final String TAG = WebViewFallbackActivity.class.getSimpleName();
     private static final String KEY_PREFIX =
             "com.google.browser.examples.twawebviewfallback.WebViewFallbackActivity.";
@@ -67,7 +72,7 @@ public class WebViewFallbackActivity extends Activity {
             Context context,
             Uri launchUrl,
             LauncherActivityMetadata launcherActivityMetadata) {
-        Intent intent = new Intent(context, WebViewFallbackActivity.class);
+        Intent intent = new CreateWebViewIntent(context, WebViewFallbackActivity.class);
         intent.putExtra(WebViewFallbackActivity.KEY_LAUNCH_URI, launchUrl);
 
         intent.putExtra(WebViewFallbackActivity.KEY_STATUS_BAR_COLOR,
@@ -149,6 +154,8 @@ public class WebViewFallbackActivity extends Activity {
         Map<String, String> headers = new HashMap<>();
         headers.put("Referer", "android-app://" + getPackageName() + "/");
         mWebView.loadUrl(mLaunchUrl.toString(), headers);
+
+        webViewHolder.webView = mWebView;
     }
 
     @Override
